@@ -1,5 +1,6 @@
-# Echo
-* 다운로드 : <https://store.steampowered.com/app/3132180/Echo/>
+# ZombieSurvival
+* 플레이 영상 : <https://youtu.be/WEAWCcp3GR4>
+* 다운로드 : <https://naver.me/GJ5cFw67>
   
 <img src="Image/Echo.png" width="600" height="350"/>
 
