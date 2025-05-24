@@ -2,19 +2,13 @@
 * 플레이 영상 : <https://youtu.be/WEAWCcp3GR4>
 * 다운로드 : <https://naver.me/GJ5cFw67>
   
-<img src="Image/Echo.png" width="600" height="350"/>
+<img src="Image/ZombieSurvival.png" width="600" height="350"/>
 
 ***
 
-* 작업 기간 : 2024. 07. 01 ~ 2024. 08. 08 (1달)
-* 인력 구성 : 4명
-* 담당 파트 : 캐릭터
+* 작업 기간 : 2025. 05. 01 ~ 2025. 05. 24 (1달)
+* 인력 구성 : 1명
 * 사용언어 및 개발환경 : C#, Unity
-  
-# 조작법    
-* W, A, S, D : 이동
-* F : 상호작용
-* Space bar : 지팡이 찍기
   
 # New Input System
 * PC와 Mobile 크로스 플랫폼에서 움직임 구현을 위해 New Input System 사용
