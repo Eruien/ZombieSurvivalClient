@@ -177,7 +177,7 @@ public class BaseCharacter : BaseObject
 </table>
 
 <details>
-<summary>FSM 코드</summary>
+<summary>Observer Pattern 코드</summary>
 	
 ```cs
 
