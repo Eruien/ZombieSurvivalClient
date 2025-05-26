@@ -150,4 +150,30 @@ public class BaseCharacter : BaseObject
 
 </details>
 
+# Observer Pattern
+* 반복문에서 비효율적인 검사를 피하고자 사용
+* HP갱신, 시민 수가 0 이 되면 게임 오버 판정, 몬스터가 0 이 되면 다음 스테이지
+  
+<table>
+  <tr>
+    <th>HP 갱신</th>
+    <th>Next Stage</th>
+ </tr>
+  <tr>
+    <td><img src="Image/HPUI.png" width="150" height="150"/></td>
+    <td><img src="Image/NextStage.png" width="150" height="150"/></td>
+</tr>
+</table>
+
+<table>
+  <tr>
+    <th>Citizen Zero</th>
+    <th>Game Over</th>
+ </tr>
+  <tr>
+    <td><img src="Image/CitizenZero.png" width="150" height="150"/></td>
+    <td><img src="Image/GameOver.png" width="150" height="150"/></td>
+</tr>
+</table>
+
 
