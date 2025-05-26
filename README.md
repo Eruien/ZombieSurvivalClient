@@ -28,6 +28,126 @@
 </tr>
 </table>
 
+<details>
+<summary>FSM 코드</summary>
+	
+```cs
+// FSM 관리 클래스
+public class FSMManager
+{
+    // FSM 다음 행동을 저장한 딕셔너리
+    public Dictionary<(State, Trigger), State> stateTransitionDict = new Dictionary<(State, Trigger), State>();
 
+    // FSM 행동을 전부 추가
+    public void Init()
+    {
+        stateTransitionDict.Add((State.Move, Trigger.InAttackDistance), State.Attack);
+        stateTransitionDict.Add((State.Attack, Trigger.OutAttackDistance), State.Move);
+    }
+
+    // FSM 현재 상태에서 트리거에 따라 다음 행동을 가져옴
+    public State Transition(State currentState, Trigger trigger)
+    {
+        return stateTransitionDict[(currentState, trigger)];
+    }
+}
+
+
+// 움직이는 캐릭터들이 상속 받을 클래스
+public class BaseCharacter : BaseObject
+{
+    // FSM에서 현재 상태
+    private State _CurrentState = State.Move;
+    public State CurrentState { get { return _CurrentState; } }
+
+    // 현재 상태와 트리거를 기반으로 다음 상태를 가져옴
+    public void SetCurrentState(Trigger trigger)
+    {
+        _CurrentState = stateObserver.Invoke(_CurrentState, trigger);
+        CurrentAction = stateActionDict[_CurrentState];
+    }
+
+    // 여기서 초기화
+    // 상태에 따른 행동 딕셔너리
+    private Dictionary<State, Action> stateActionDict = new Dictionary<State, Action>();
+  
+    // 현재 상태와 트리거를 기반으로 다음 상태를 가져옴
+    private Func<State, Trigger, State> stateObserver;
+    // 현재 실행되고 있는 액션
+    private Action CurrentAction;
+   
+    // 유니티 함수
+    protected override void Awake()
+    {
+        SetStateAction();
+    }
+
+    protected override void OnEnable()
+    {
+        // 상태 변화 함수 등록
+        stateObserver = Managers.FSM.Transition;
+        // 기본 상태를 Move로 등록
+        CurrentAction = Move;
+    }
+
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+
+        if (Target != null)
+        {
+            CurrentAction.Invoke();
+        }
+    }
+
+    // FSM State 함수
+    public void Idle()
+    {
+
+    }
+
+    // 현재 상태에서 조건을 만족하면 다른 상태로 전환
+    public void Move()
+    {
+        objectAnimation.SetBool("IsMove", true);
+
+        transform.LookAt(Target.transform);
+        moveDirection = Target.transform.position - transform.position;
+        moveDirection.y = 0;
+        objectRigidBody.MovePosition(transform.position + moveDirection.normalized * objectStat.moveSpeed * Time.fixedDeltaTime);
+
+        if (ComputeAttackDistance())
+        {
+            SetCurrentState(Trigger.InAttackDistance);
+        }
+    }
+
+    // 현재 상태에서 조건을 만족하면 다른 상태로 전환
+    private void Attack()
+    {
+        if (!ComputeAttackDistance())
+        {
+            SetCurrentState(Trigger.OutAttackDistance);
+        }
+
+        objectAnimation.SetBool("IsMove", false);
+        objectAnimation.SetTrigger("IsAttack");
+        transform.LookAt(Target.transform);
+    }
+
+    // 일반 함수
+
+    // FSM에서 쓸 상태들 등록
+    protected void SetStateAction()
+    {
+        stateActionDict.Add(State.Idle, Idle);
+        stateActionDict.Add(State.Move, Move);
+        stateActionDict.Add(State.Attack, Attack);
+    }
+}
+
+```
+
+</details>
 
 
