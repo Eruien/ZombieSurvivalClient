@@ -333,7 +333,6 @@ public class BaseCharacter : BaseObject
 <summary>Managers 코드</summary>
 	
 ```cs
-
 // 총괄 매니저 클래스 싱글턴을 통해 모든 매니저는 이 매니저 클래스를 통해 반환
 public class Managers : MonoBehaviour
 {
@@ -436,11 +435,6 @@ public class FSMManager
         return stateTransitionDict[(currentState, trigger)];
     }
 }
-
-using Assets.Scripts;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 // 딕셔너리를 사용할 경우 딕셔너리 데이터를 추가하게 강제
 public interface IDict<Key, Value>
@@ -1036,8 +1030,6 @@ public class SoundManager
         Managers.FindChildObject(obj, "EffectSlider").GetComponent<Slider>().value = EffectVolume; 
     }
 }
-
-
 ```
 
 <details/>
