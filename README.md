@@ -176,4 +176,153 @@ public class BaseCharacter : BaseObject
 </tr>
 </table>
 
+<details>
+<summary>FSM 코드</summary>
+	
+```cs
+
+// 최상위 부모 기본 요소 추가(타겟, hp, ui 활성화 여부, 캐릭터가 죽었을 때 행동 기본 정의)
+public class BaseObject : MonoBehaviour
+{
+    [SerializeField]
+    private GameObject _Target;
+
+    // 관찰차 패턴(상대가 자신을 타겟으로 삼을 때 등록 죽었을 때 이벤트 발동)
+    // 상대가 자신을 타겟으로 삼았을 때 타겟으로 삼은 대상을 이벤트 등록
+    // 현재 대상이 체력이 0이 되면 Death에서 이벤트 발동 이 타겟말고 다른 타겟으로 바꾸게
+    public GameObject Target
+    {
+        get { return _Target; }
+        set
+        { 
+            _Target = value;
+            _Target.GetComponent<BaseObject>().enemyObserver += ChangeTarget;
+        }
+    }
+
+    [SerializeField]
+    private float _hp = 0.0f;
+
+    // 관찰자 패턴(HP가 줄어들었을 때 등록된 이벤트 발동)
+    // hp가 0이 되었을 때 Death 함수 작동
+    // IsViewHP를 통해 hp가 100%인 경우 ui가 보이지 않게
+    // hp가 변경 될 경우 ui를 갱신
+    public float hp
+    {
+        get { return _hp; }
+        set
+        {
+            float prevHP = _hp;
+            _hp = value;
+
+            if (_hp - prevHP < 0)
+            {
+                if (hpDecreaseObserver != null)
+                {
+                    hpDecreaseObserver.Invoke();
+                }
+            }
+           
+            if (_hp <= float.Epsilon)
+            {
+                Death();
+            }
+
+            if (IsViewHP)
+            {
+                if (MathF.Abs(objectStat.maxhp - _hp) <= float.Epsilon)
+                {
+                    hpBarUI.SetActive(false);
+                }
+                else
+                {
+                    hpBarUI.SetActive(true);
+                }
+            }
+        } 
+    }
+
+    // 아래에서 초기화
+    // 나를 타겟으로 삼은 적을 등록
+    public Action enemyObserver;
+    // 본인이 죽었을 때 이벤트 등록
+    public Action deathObserver;
+    // hp가 줄어들었을 때 이벤트 등록
+    public Action hpDecreaseObserver;
+    
+    public bool IsDeath = false;
+    public bool IsViewHP = true;
+
+    protected virtual void OnDisable()
+    {
+        if (_Target != null)
+        {
+            _Target.GetComponent<BaseObject>().enemyObserver -= ChangeTarget;
+        }
+    }
+
+    // ui를 보여줄지 여부
+    public void ViewHPBarUI(bool view)
+    {
+        IsViewHP = view;
+        hpBarUI.SetActive(view);
+    }
+
+    // 캐릭터가 죽으면 할 행동
+    protected virtual void Death()
+    {
+        IsDeath = true;
+
+        if (_Target != null)
+        {
+            _Target.GetComponent<BaseObject>().enemyObserver -= ChangeTarget;
+        }
+
+        if (enemyObserver != null)
+        {
+            enemyObserver.Invoke();
+            enemyObserver = null;
+        }
+       
+        if (deathObserver != null)
+        {
+            deathObserver.Invoke();
+            deathObserver = null;
+        }
+       
+        gameObject.SetActive(false);
+    }
+}
+
+
+// 움직이는 캐릭터들이 상속 받을 클래스
+public class BaseCharacter : BaseObject
+{
+    // FSM에서 현재 상태
+    private State _CurrentState = State.Move;
+    public State CurrentState { get { return _CurrentState; } }
+
+     // 관찰자 패턴(상태를 바꿀려고 할 때 등록된 이벤트 실행)
+    // 현재 상태와 트리거를 기반으로 다음 상태를 가져옴
+    public void SetCurrentState(Trigger trigger)
+    {
+        _CurrentState = stateObserver.Invoke(_CurrentState, trigger);
+        CurrentAction = stateActionDict[_CurrentState];
+    }
+
+    // 여기서 초기화
+    // 상태에 따른 행동 딕셔너리
+    private Dictionary<State, Action> stateActionDict = new Dictionary<State, Action>();
+   
+    // 현재 상태와 트리거를 기반으로 다음 상태를 가져옴
+    private Func<State, Trigger, State> stateObserver;
+    // 현재 실행되고 있는 액션
+    private Action CurrentAction;
+  }
+
+
+```
+
+</details>
+
 
